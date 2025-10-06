@@ -1,0 +1,33 @@
+# .github/workflows/daily-trend-research.yml
+name: Daily Printify Trend Research
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # 10 AM UTC daily (6 AM EST)
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  trend-research:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run Printify trend finder
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          PRINTIFY_SHEET_ID: ${{ secrets.PRINTIFY_SHEET_ID }}
+        run: python printify_trend_finder.py
